@@ -1,42 +1,46 @@
-import { Routes, Route } from 'react-router-dom'
-import { Toaster } from 'sonner'
-import { ThemeProvider, useTheme } from './context/ThemeContext'
-import ChatPage from './pages/ChatPage'
-import AdminLogin from './pages/AdminLogin'
-import AdminDashboard from './pages/AdminDashboard'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import Index from "./pages/Index.tsx";
+import NotFound from "./pages/NotFound.tsx";
+import Login from "./pages/Login.tsx";
+import AdminDashboard from "./pages/AdminDashboard.tsx";
+import { RequireAuth } from "@/components/RequireAuth";
 
-function AppContent() {
-  const { theme } = useTheme()
-  return (
-    <div className={theme === 'dark' ? 'gradient-bg-dark' : 'gradient-bg-light'} style={{ minHeight: '100vh' }}>
-      <div className="mesh-gradient" />
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: theme === 'dark' ? '#12121a' : '#ffffff',
-            color: theme === 'dark' ? '#f1f5f9' : '#0f172a',
-            border: theme === 'dark' ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)',
-            backdropFilter: 'blur(20px)',
-          },
-        }}
-        richColors
-      />
-      <Routes>
-        <Route path="/" element={<ChatPage />} />
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      </Routes>
-    </div>
-  )
-}
+const queryClient = new QueryClient();
 
-function App() {
-  return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
-  )
-}
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner theme="dark" position="top-right" richColors closeButton />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <RequireAuth>
+                <Index />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <RequireAuth role="admin">
+                <AdminDashboard />
+              </RequireAuth>
+            }
+          />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
-export default App
+export default App;

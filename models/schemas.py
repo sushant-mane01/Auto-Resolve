@@ -71,6 +71,14 @@ class KBTestRequest(BaseModel):
 class GoogleLoginRequest(BaseModel):
     token: str
 
+class EmailSignInRequest(BaseModel):
+    email: str
+    password: str
+
+class EmailSignUpRequest(BaseModel):
+    email: str
+    password: str
+
 class AuthResponse(BaseModel):
     success: bool
     token: str

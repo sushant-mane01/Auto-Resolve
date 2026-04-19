@@ -1,8 +1,8 @@
 """
-auth_routes.py - Router for Google Auth processing
+auth_routes.py - Router for Google Auth and Email/Password Auth
 """
 from fastapi import APIRouter, HTTPException
-from models.schemas import GoogleLoginRequest, AuthResponse
+from models.schemas import GoogleLoginRequest, EmailSignInRequest, EmailSignUpRequest, AuthResponse
 from services.auth_service import AuthService
 from models.database import SessionLocal, DBUser
 
@@ -51,3 +51,69 @@ async def google_login(request: GoogleLoginRequest):
         email=email,
         message="Login successful"
     )
+
+@router.post("/signin", response_model=AuthResponse)
+async def email_signin(request: EmailSignInRequest):
+    """Sign in with email and password."""
+    db = SessionLocal()
+    try:
+        user = db.query(DBUser).filter(DBUser.email == request.email).first()
+        if not user or not user.check_password(request.password):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        role = AuthService.get_role_for_email(user.email)
+        # Update role if admin list changed
+        if user.role != role:
+            user.role = role
+            db.commit()
+
+        access_token = AuthService.create_access_token({
+            "email": user.email,
+            "role": role,
+            "name": user.name or user.email.split("@")[0]
+        })
+
+        return AuthResponse(
+            success=True,
+            token=access_token,
+            role=role,
+            name=user.name or user.email.split("@")[0],
+            email=user.email,
+            message="Login successful"
+        )
+    finally:
+        db.close()
+
+@router.post("/signup", response_model=AuthResponse)
+async def email_signup(request: EmailSignUpRequest):
+    """Create a new account with email and password."""
+    db = SessionLocal()
+    try:
+        existing = db.query(DBUser).filter(DBUser.email == request.email).first()
+        if existing:
+            raise HTTPException(status_code=409, detail="Email already registered")
+        
+        name = request.email.split("@")[0].replace(".", " ").replace("_", " ").title()
+        role = AuthService.get_role_for_email(request.email)
+        
+        user = DBUser(email=request.email, name=name, role=role)
+        user.set_password(request.password)
+        db.add(user)
+        db.commit()
+
+        access_token = AuthService.create_access_token({
+            "email": user.email,
+            "role": role,
+            "name": name
+        })
+
+        return AuthResponse(
+            success=True,
+            token=access_token,
+            role=role,
+            name=name,
+            email=user.email,
+            message="Account created successfully"
+        )
+    finally:
+        db.close()

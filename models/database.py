@@ -4,6 +4,8 @@ Database configuration and SQLAlchemy models.
 import json
 from datetime import datetime
 from sqlalchemy import create_engine, Column, String, Integer, Boolean, DateTime, Text
+import hashlib
+import secrets
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 DATABASE_URL = "sqlite:///./auto_resolve.db"
@@ -19,7 +21,20 @@ class DBUser(Base):
     email = Column(String, primary_key=True, index=True)
     name = Column(String, nullable=True)
     role = Column(String, default="user")  # "user" or "admin"
+    password_hash = Column(String, nullable=True)  # None for Google-only users
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    def set_password(self, password: str):
+        salt = secrets.token_hex(16)
+        pw_hash = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 100000).hex()
+        self.password_hash = f"{salt}${pw_hash}"
+
+    def check_password(self, password: str) -> bool:
+        if not self.password_hash:
+            return False
+        salt, stored_hash = self.password_hash.split('$', 1)
+        pw_hash = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 100000).hex()
+        return pw_hash == stored_hash
 
 
 class DBChatSession(Base):
