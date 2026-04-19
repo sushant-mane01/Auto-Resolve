@@ -16,7 +16,7 @@ interface AnalyticsData {
 
 function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: string }) {
   const [displayVal, setDisplayVal] = useState(0)
-  const ref = useRef<number>()
+  const ref = useRef<number>(0)
   useEffect(() => {
     const start = displayVal; const diff = value - start
     if (diff === 0) return
