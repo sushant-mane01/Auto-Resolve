@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+env.bak/
+venv.bak/
+
+# Environment Variables
+.env
+
+# Database
+auto_resolve.db
+*.sqlite3
+
+# Frontend (if built from root)
+node_modules/
+dist/
+dist-ssr/
+.DS_Store
