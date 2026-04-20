@@ -3,7 +3,7 @@
 
 import type { AuthUser, Role } from "@/store/auth";
 
-const BASE = ""; // Uses Vite proxy in dev, same-origin in prod
+const BASE = import.meta.env.VITE_API_URL || ""; // Uses Vite proxy locally, VITE_API_URL in production
 
 // ----------------------- Types -----------------------
 
