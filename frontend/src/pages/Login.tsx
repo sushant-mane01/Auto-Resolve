@@ -38,8 +38,8 @@ const Login = () => {
       setAuth(token, user);
       toast.success(mode === "signin" ? `Welcome back, ${user.name}` : `Account created for ${user.name}`);
       navigate(routeFor(user.role), { replace: true });
-    } catch {
-      toast.error(mode === "signin" ? "Sign in failed" : "Sign up failed");
+    } catch (error: any) {
+      toast.error(error.message || (mode === "signin" ? "Sign in failed" : "Sign up failed"));
     } finally {
       setLoading("none");
     }
