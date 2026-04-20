@@ -80,6 +80,9 @@ const Chat = () => {
       setActiveId(res.session_id);
       setMessages((m) => [...m, res.reply]);
       if (res.escalated) toast.warning("Escalated to a human responder", { description: "A specialist has been paged." });
+      
+      // Refresh the sidebar so the ticket status updates live
+      getChatHistory().then(setSessions);
     } catch (e) {
       toast.error("Failed to send message");
     } finally {
