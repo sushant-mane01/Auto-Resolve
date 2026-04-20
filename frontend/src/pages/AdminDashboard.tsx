@@ -121,7 +121,7 @@ const AnalyticsTab = () => {
 
   const metrics = [
     { label: "Total sessions", value: data.metrics.total_sessions.toLocaleString(), tone: "text-foreground" },
-    { label: "Resolution rate", value: `${(data.metrics.resolution_rate * 100).toFixed(1)}%`, tone: "text-emerald-400" },
+    { label: "Resolution rate", value: `${data.metrics.resolution_rate.toFixed(1)}%`, tone: "text-emerald-400" },
     { label: "Avg confidence", value: `${(data.metrics.avg_confidence * 100).toFixed(0)}%`, tone: "text-primary" },
     { label: "Escalations · 24h", value: data.metrics.escalations_24h, tone: "text-rose-400" },
   ];
