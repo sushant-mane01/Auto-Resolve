@@ -23,26 +23,9 @@ import { getChatHistory, postChat, postFeedback, type ChatMessage, type ChatSess
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const detectMeta = (text: string): Pick<ChatMessage, "sentiment" | "urgency"> | {} => {
-  const t = text.toLowerCase().trim();
-  
-  // Skip categorization for simple conversational back-and-forth
-  if (t.length < 15 && /^(yes|no|y|n|thanks|thank you|ok|okay|sure|great)$/i.test(t)) {
-    return {};
-  }
-  
-  const negative = /(angry|frustrat|broken|down|terrible|awful|never|hate|urgent|asap|critical)/.test(t);
-  const positive = /(thank|great|awesome|love|perfect)/.test(t);
-  const urgency = /(critical|production|outage|down)/.test(t)
-    ? "critical"
-    : /(urgent|asap|now)/.test(t)
-    ? "high"
-    : negative
-    ? "medium"
-    : "low";
-  const sentiment = negative ? "negative" : positive ? "positive" : "neutral";
-  return { sentiment, urgency };
-};
+// User messages don't need client-side sentiment/urgency badges.
+// The backend handles detection and only resolution messages get badges via postChat mapping.
+const detectMeta = (_text: string) => ({});
 
 const Chat = () => {
   const [sessions, setSessions] = useState<ChatSession[]>([]);

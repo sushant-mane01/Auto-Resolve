@@ -120,7 +120,11 @@ class BotService:
         # Build reply
         reply = self._format_resolution(result, sentiment)
         bot_index = session.add_message("bot", reply)
-        session.set_awaiting_confirmation(True)
+
+        # Only enter confirmation mode for actual resolutions, not greetings
+        is_resolution = "Issue Category:" in reply
+        if is_resolution:
+            session.set_awaiting_confirmation(True)
 
         return {
             "reply": reply,
@@ -130,7 +134,7 @@ class BotService:
             "sentiment": sentiment,
             "urgency": urgency,
             "category": session.category,
-            "awaiting_confirmation": True,
+            "awaiting_confirmation": is_resolution,
             "message_index": bot_index,
         }
 

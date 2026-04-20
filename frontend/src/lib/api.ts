@@ -174,13 +174,18 @@ export async function postChat(payload: { session_id: string | null; message: st
     }),
   });
 
+  // The backend returns reply as a plain string.
+  // Only attach metadata badges if this is an actual resolution (contains "Issue Category:")
+  const replyText = typeof data.reply === "object" ? (data.reply.content || "") : (data.reply || "");
+  const isResolution = replyText.includes("Issue Category:");
+
   const reply: ChatMessage = {
     role: "assistant",
-    content: data.reply || "",
+    content: replyText,
     timestamp: new Date().toISOString(),
-    sentiment: data.sentiment as Sentiment | undefined,
-    urgency: data.urgency as Urgency | undefined,
-    category: data.category,
+    sentiment: isResolution ? (data.sentiment as Sentiment | undefined) : undefined,
+    urgency: isResolution ? (data.urgency as Urgency | undefined) : undefined,
+    category: isResolution ? data.category : undefined,
     confidence: data.confidence,
     escalated: data.escalated,
   };
