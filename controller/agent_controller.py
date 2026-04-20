@@ -153,8 +153,22 @@ class AgentController:
                 cs.ticket_status = s.ticket_status
                 cs.user_email = s.user_email
                 cs.created_at = s.created_at
+                # Ensure created_at has timezone info for 24h comparisons
+                if cs.created_at and cs.created_at.tzinfo is None:
+                    from datetime import timezone
+                    cs.created_at = cs.created_at.replace(tzinfo=timezone.utc)
                 # Add conversation_history so AnalyticsService can use it!
                 cs.conversation_history = s.get_history()
+                # Extract confidence from conversation history for analytics
+                # Look for "Confidence: XX%" in bot messages
+                import re
+                for msg in cs.conversation_history:
+                    if msg.get("role") == "bot":
+                        text = msg.get("text", "")
+                        match = re.search(r"Confidence:\s*(\d+)%", text)
+                        if match:
+                            confidence_val = int(match.group(1)) / 100.0
+                            cs.last_bot_response = {"confidence": confidence_val}
                 mem_sessions[s.session_id] = cs
             return AnalyticsService.compute_stats(mem_sessions)
         finally:
