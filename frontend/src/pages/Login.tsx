@@ -52,8 +52,8 @@ const Login = () => {
       setAuth(token, user);
       toast.success(`Signed in as ${user.name}`);
       navigate(routeFor(user.role), { replace: true });
-    } catch {
-      toast.error("Sign in failed");
+    } catch (error: any) {
+      toast.error(error.message || "Sign in failed");
     } finally {
       setLoading("none");
     }
