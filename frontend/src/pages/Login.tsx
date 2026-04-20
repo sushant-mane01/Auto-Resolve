@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { loginWithGoogle, signInWithEmail, signUpWithEmail } from "@/lib/api";
 import { useAuth } from "@/store/auth";
 import { toast } from "sonner";
+import { GoogleLogin } from "@react-oauth/google";
 
 type Mode = "signin" | "signup";
 
@@ -44,10 +45,10 @@ const Login = () => {
     }
   };
 
-  const handleGoogle = async () => {
+  const handleGoogleSuccess = async (credential: string) => {
     setLoading("google");
     try {
-      const { token, user } = await loginWithGoogle({ token: "mock_google_credential" });
+      const { token, user } = await loginWithGoogle({ token: credential });
       setAuth(token, user);
       toast.success(`Signed in as ${user.name}`);
       navigate(routeFor(user.role), { replace: true });
@@ -185,20 +186,18 @@ const Login = () => {
                 <div className="h-px flex-1 bg-border-strong" />
               </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGoogle}
-                disabled={loading !== "none"}
-                className="h-12 w-full justify-center gap-3 border-border-strong bg-transparent text-base hover:bg-secondary"
-              >
-                {loading === "google" ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <GoogleMark />
-                )}
-                <span className="font-medium">Continue with Google</span>
-              </Button>
+              <div className="flex justify-center w-full min-h-[48px]">
+                <GoogleLogin
+                  onSuccess={(res) => {
+                    if (res.credential) handleGoogleSuccess(res.credential);
+                  }}
+                  onError={() => toast.error("Google login failed")}
+                  useOneTap
+                  theme="outline"
+                  size="large"
+                  text="continue_with"
+                />
+              </div>
             </div>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
@@ -217,12 +216,5 @@ const Login = () => {
     </main>
   );
 };
-
-const GoogleMark = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
-    <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.24 1.4-1.7 4.1-5.5 4.1-3.3 0-6-2.7-6-6.1S8.7 6 12 6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.5 14.6 2.5 12 2.5 6.8 2.5 2.6 6.7 2.6 12s4.2 9.5 9.4 9.5c5.4 0 9-3.8 9-9.2 0-.6-.06-1.1-.16-1.6H12z"/>
-    <path fill="#34A853" d="M3.6 7.4l3.2 2.4C7.7 7.9 9.7 6.5 12 6.5c1.8 0 3 .8 3.7 1.5l2.6-2.5C16.6 3.6 14.5 2.5 12 2.5 8.3 2.5 5.1 4.6 3.6 7.4z" opacity="0"/>
-  </svg>
-);
 
 export default Login;
