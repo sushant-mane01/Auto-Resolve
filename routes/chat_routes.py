@@ -3,6 +3,7 @@ chat_routes.py - Chat API with User history support
 """
 from fastapi import APIRouter, HTTPException, Header
 from typing import Optional
+from datetime import datetime, timezone
 from models.schemas import ChatRequest, ChatResponse, FeedbackRequest
 from controller.agent_controller import agent_controller
 from services.auth_service import AuthService
