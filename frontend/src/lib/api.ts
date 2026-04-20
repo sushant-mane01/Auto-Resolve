@@ -36,6 +36,7 @@ export interface ChatSession {
 
 export interface KBArticle {
   id: string;
+  ticket_id?: string;
   title: string;
   category: string;
   content: string;
@@ -292,6 +293,7 @@ export async function getKB(): Promise<KBArticle[]> {
   const data = await apiFetch<any[]>("/api/admin/kb");
   return data.map((entry) => ({
     id: String(entry.id),
+    ticket_id: entry.ticket_id || "",
     title: entry.problem_description?.slice(0, 60) || entry.category || "KB Article",
     category: entry.category || "General",
     content: [

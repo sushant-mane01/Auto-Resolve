@@ -481,8 +481,11 @@ const KBTab = () => {
             {items.map((a) => (
               <tr key={a.id} className="border-b border-border/60 last:border-0 hover:bg-secondary/20">
                 <td className="px-5 py-3">
-                  <div className="font-medium text-foreground">{a.title}</div>
-                  <div className="line-clamp-1 text-[11px] text-muted-foreground">{a.content}</div>
+                  <div className="font-medium text-foreground flex items-center gap-2">
+                    {a.ticket_id && <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-primary">{a.ticket_id}</span>}
+                    {a.title}
+                  </div>
+                  <div className="line-clamp-1 text-[11px] text-muted-foreground mt-1">{a.content}</div>
                 </td>
                 <td className="px-5 py-3">
                   <span className="rounded-full border border-border-strong bg-secondary/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">{a.category}</span>
