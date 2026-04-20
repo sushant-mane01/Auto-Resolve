@@ -261,16 +261,21 @@ class BotService:
     @staticmethod
     def _format_resolution(result: Dict[str, Any], sentiment: str = "neutral") -> str:
         category = result.get('issue_category', '')
+        if not category:
+            category = ""
+            
+        cat_lower = category.lower()
         
         # If the AI or heuristic determines this is just a greeting, clarification, or casual chat,
         # skip the rigid resolution formatting completely.
         if (
-            "initial contact" in category.lower() or 
-            "greeting" in category.lower() or 
-            "clarification" in category.lower() or
-            "general discussion" in category.lower()
+            "initial contact" in cat_lower or 
+            "greeting" in cat_lower or 
+            "clarification" in cat_lower or
+            "general discussion" in cat_lower or
+            cat_lower in ["none", "n/a", "", "null"]
         ):
-            return result['resolution']
+            return result.get('resolution', '')
 
         confidence_pct = f"{result.get('confidence', 0) * 100:.0f}%"
 

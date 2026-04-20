@@ -4,11 +4,12 @@ import { cn } from "@/lib/utils";
 
 export const SentimentBadge = ({ value }: { value?: Sentiment }) => {
   if (!value) return null;
-  const cfg = {
+  const cfg = ({
     positive: { label: "Positive", icon: ArrowUpRight, cls: "text-emerald-400 border-emerald-400/20 bg-emerald-400/5" },
     neutral: { label: "Neutral", icon: Minus, cls: "text-muted-foreground border-border-strong bg-secondary/40" },
     negative: { label: "Negative", icon: ArrowDownRight, cls: "text-rose-400 border-rose-400/20 bg-rose-400/5" },
-  }[value];
+  } as any)[value];
+  if (!cfg) return null;
   const Icon = cfg.icon;
   return (
     <span className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider", cfg.cls)}>
@@ -20,12 +21,13 @@ export const SentimentBadge = ({ value }: { value?: Sentiment }) => {
 
 export const UrgencyBadge = ({ value }: { value?: Urgency }) => {
   if (!value) return null;
-  const cfg = {
+  const cfg = ({
     low: { label: "Low", icon: Minus, cls: "text-muted-foreground border-border-strong bg-secondary/40" },
     medium: { label: "Medium", icon: Zap, cls: "text-amber-400 border-amber-400/20 bg-amber-400/5" },
     high: { label: "High", icon: Flame, cls: "text-amber-400 border-amber-400/30 bg-amber-400/10" },
     critical: { label: "Critical", icon: ShieldAlert, cls: "text-rose-400 border-rose-400/30 bg-rose-400/10" },
-  }[value];
+  } as any)[value];
+  if (!cfg) return null;
   const Icon = cfg.icon;
   return (
     <span className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider", cfg.cls)}>
