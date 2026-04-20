@@ -260,7 +260,19 @@ class BotService:
 
     @staticmethod
     def _format_resolution(result: Dict[str, Any], sentiment: str = "neutral") -> str:
-        confidence_pct = f"{result['confidence'] * 100:.0f}%"
+        category = result.get('issue_category', '')
+        
+        # If the AI or heuristic determines this is just a greeting, clarification, or casual chat,
+        # skip the rigid resolution formatting completely.
+        if (
+            "initial contact" in category.lower() or 
+            "greeting" in category.lower() or 
+            "clarification" in category.lower() or
+            "general discussion" in category.lower()
+        ):
+            return result['resolution']
+
+        confidence_pct = f"{result.get('confidence', 0) * 100:.0f}%"
 
         # Empathetic preamble for frustrated/angry users
         preamble = ""
@@ -272,8 +284,8 @@ class BotService:
 
         return (
             f"{preamble}"
-            f"Issue Category: {result['issue_category']}\n"
-            f"Suggested Resolution: {result['resolution']}\n"
+            f"Issue Category: {category}\n"
+            f"Suggested Resolution: {result.get('resolution', '')}\n"
             f"Confidence: {confidence_pct}\n\n"
             f"Did that resolve your issue? (Yes / No)"
         )
