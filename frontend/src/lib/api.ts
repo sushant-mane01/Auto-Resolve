@@ -217,10 +217,10 @@ export async function getAdminAnalytics() {
       avg_confidence: data.avg_confidence || 0,
       escalations_24h: data.escalated_sessions || 0,
     },
-    timeseries: ((data.queries_by_hour || []) as [string, number][]).map(([time, count]) => ({
-      day: time,
-      Resolved: count,
-      Escalated: Math.floor(count * 0.1), // visually differentiate
+    timeseries: ((data.queries_by_day || []) as [string, {resolved: number, escalated: number}][]).map(([day, counts]) => ({
+      day,
+      Resolved: counts.resolved,
+      Escalated: counts.escalated,
     })),
     sentiment: Object.entries(data.sentiment_breakdown || {}).map(([name, value]) => ({ name, value })),
     categories: Object.entries(data.category_breakdown || {}).map(([name, value]) => ({ name, value })),

@@ -65,21 +65,31 @@ class AnalyticsService:
         # Total messages
         total_messages = sum(len(s.conversation_history) for s in all_sessions)
 
-        # Queries over time (last 24 hours, grouped by hour)
+        # Queries over time (last 14 days, grouped by day)
         now = datetime.now(timezone.utc)
-        queries_by_hour = {}
-        for s in all_sessions:
-            for msg in s.conversation_history:
-                if msg["role"] == "user":
-                    ts = msg["timestamp"]
-                    if isinstance(ts, str):
-                        ts = datetime.fromisoformat(ts)
-                    if now - ts < timedelta(hours=24):
-                        hour_key = ts.strftime("%H:00")
-                        queries_by_hour[hour_key] = queries_by_hour.get(hour_key, 0) + 1
+        queries_by_day = {}
+        # Initialize all 14 days so the chart has no gaps
+        for i in range(13, -1, -1):
+            day = now - timedelta(days=i)
+            day_key = day.strftime("%d %b")
+            queries_by_day[day_key] = {"resolved": 0, "escalated": 0}
 
-        # Sort hours
-        sorted_hours = sorted(queries_by_hour.items())
+        for s in all_sessions:
+            created = s.created_at
+            if isinstance(created, str):
+                created = datetime.fromisoformat(created)
+            if created.tzinfo is None:
+                created = created.replace(tzinfo=timezone.utc)
+            if now - created < timedelta(days=14):
+                day_key = created.strftime("%d %b")
+                if day_key in queries_by_day:
+                    if s.status == "resolved":
+                        queries_by_day[day_key]["resolved"] += 1
+                    elif s.status == "escalated":
+                        queries_by_day[day_key]["escalated"] += 1
+
+        # Convert to sorted list of tuples
+        sorted_days = list(queries_by_day.items())
 
         # Escalated tickets summary
         tickets = [
@@ -113,7 +123,7 @@ class AnalyticsService:
             "category_breakdown": dict(categories),
             "sentiment_breakdown": dict(sentiments),
             "urgency_breakdown": dict(urgencies),
-            "queries_by_hour": sorted_hours,
+            "queries_by_day": sorted_days,
             "feedback": {
                 "total": total_feedback,
                 "helpful": helpful_count,
