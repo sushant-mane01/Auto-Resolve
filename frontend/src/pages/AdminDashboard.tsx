@@ -471,7 +471,7 @@ const KBTab = () => {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-              <th className="px-5 py-3 font-medium">Ticket ID</th>
+              <th className="px-5 py-3 font-medium whitespace-nowrap w-[100px]">Ticket ID</th>
               <th className="px-5 py-3 font-medium">Title</th>
               <th className="px-5 py-3 font-medium">Category</th>
               <th className="px-5 py-3 font-medium">Updated</th>
@@ -481,7 +481,7 @@ const KBTab = () => {
           <tbody>
             {items.map((a) => (
               <tr key={a.id} className="border-b border-border/60 last:border-0 hover:bg-secondary/20">
-                <td className="px-5 py-3 font-mono text-xs text-muted-foreground">
+                <td className="px-5 py-3 font-mono text-xs text-muted-foreground whitespace-nowrap">
                   {a.ticket_id ? <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-primary">{a.ticket_id}</span> : <span>—</span>}
                 </td>
                 <td className="px-5 py-3">
